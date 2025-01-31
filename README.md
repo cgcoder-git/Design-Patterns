@@ -7,7 +7,7 @@ Design patterns are typical solutions to commonly occurring problems in software
 ## Types of Design Patterns
 1. Creational Design Patterns
 2. Structural Design Patterns
-3. 3 Behavioral Design Pattrens
+3. Behavioral Design Pattrens
 
 ## Diagram :
   
