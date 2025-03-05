@@ -14,3 +14,23 @@ Design patterns are typical solutions to commonly occurring problems in software
 ![image](https://github.com/user-attachments/assets/94237aa0-c083-47da-b22d-aca36bf3ff6c)
 
 # Creational Design Pattern
+- As name suggest Creational Design pattern mainly deal with the creation of the object.
+A creational design pattern is a type of design pattern in software engineering that deals with object creation mechanisms, aiming to create objects in a manner suitable to the situation. These patterns help make a system independent of how its objects are created, composed, and represented, while also promoting flexibility and reuse of code.
+
+## Let's see Creational Design Patterns - 
+1. Singleton Pattern
+2. Factory Method Pattern
+3. Abstract Factory Pattern
+4. Builder Pattern
+5. Prototype Pattern
+
+## Singleton Pattern
+- Singleton suggest that, **one and only one** object/instance should be created.
+- The Singleton Pattern restricts a class to a single instance and provides a way to access that instance globally.
+- Think of this like, there is a centralized printer which is accessible by every department, so provides a global access but only one instance can use it at a time.
+
+**There are two ways mainly, one is using static methods and another is using decorator**
+```python
+class Singleton:
+    pass
+```
