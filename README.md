@@ -32,5 +32,186 @@ A creational design pattern is a type of design pattern in software engineering 
 **There are two ways mainly, one is using static methods and another is using decorator**
 ```python
 class Singleton:
-    pass
+    # global private variable
+    _instance = None
+
+    """
+    Handle conditions:
+    1. Globaly accessible private variable
+    1. if no instance initialized, init one
+    2. if already an instance exist, return the existing one
+    """
+    def __new__(cls):
+        if cls._instance == None:
+            # instance not initialized
+            cls._instance = super().__new__(cls)
+            print("Initialized")
+            return cls._instance
+        else:
+            # if already initialized
+            print("Already there, So Returning existing one")
+            return cls._instance
+        
+    @staticmethod
+    def calculate_area():
+        print("Area Calculated")
+
+if __name__ == "__main__":
+    obj1 = Singleton()
+    obj1.calculate_area()
+    obj2 = Singleton()
+    obj2.calculate_area()
+
+"""
+Initialized
+Area Calculated
+Already there, So Returning existing one
+Area Calculated
+"""
 ```
+**Using Decorators**
+Decorators allow us to wrap another function in order to extend the behavior of the wrapped function.
+
+```python
+def singleton_wrap(cls):
+    _instance = {}
+    def set_instance():
+        if cls not in _instance:
+            _instance[cls] = cls()
+            print("Instance Initialized")
+        else:
+            print("Already Initialized")
+    return set_instance
+
+
+@singleton_wrap
+class SingletonDecor:
+    def __init__(self):
+        print("Instance Created")
+    
+if __name__ == "__main__":
+    obj1 = SingletonDecor()
+    obj2 = SingletonDecor()
+
+"""
+Instance Created
+Instance Initialized
+Already Initialized
+"""
+```
+
+**Singleton & Multithreading** : 
+when dealing with multithreading in singleton,it's pretty tricky, as the concept is to have a one and only one instance/object at a time, multithreading breaks it , as it create two instance at the same time, to prevent that we need to take certain measures. here is the example - 1st without handling & 2nd with handling.
+
+```python
+from threading import Thread
+import time
+
+class Singleton:
+    # global private variable
+    _instance = None
+    """
+    Handle conditions:
+    1. Globaly accessible private variable
+    1. if no instance initialized, init one
+    2. if already an instance exist, return the existing one
+    """
+    def __new__(cls):
+        if cls._instance == None:
+            # instance not initialized
+            time.sleep(0.1)
+            cls._instance = super().__new__(cls)
+            print("Initialized")
+            return cls._instance
+        else:
+            # if already initialized
+            print("Already there, So Returning existing one")
+            return cls._instance
+        
+    @staticmethod
+    def calculate_area():
+        print("Area Calculated")
+
+def create_instance():
+    sq = Singleton()
+    print(f"instance id : {id(sq)}")
+
+if __name__ == "__main__":
+    threads  =[]
+    for _ in range(3):
+        t = Thread(target=create_instance)
+        threads.append(t)
+        t.start()
+    
+    for t in threads:
+        t.join()
+
+"""
+Initialized
+instance id : 1827982004432
+Initialized
+instance id : 1827982004096
+Initialized
+instance id : 1827982004288
+"""
+```
+- Added sleep time because adding a delay forces the issue and shows that multiple instances can be created.
+- Without sleep your code might not fail due to GIL(Global interpreter Lock) & thread Scheduling.
+- to Resolve this we can use lock (threading.Lock()) to properly synchronize instance creation, but it is costly as its a system call.
+**With Lock**
+
+```python
+from threading import Thread, Lock
+import time
+
+class Singleton:
+    # global private variable
+    _instance = None
+    _lock = Lock()
+
+    """
+    Handle conditions:
+    1. Globaly accessible private variable
+    1. if no instance initialized, init one
+    2. if already an instance exist, return the existing one
+    """
+    def __new__(cls):
+        with cls._lock:
+            if cls._instance == None:
+                # instance not initialized
+                time.sleep(0.1)
+                cls._instance = super().__new__(cls)
+                print("Initialized")
+            else:
+                # if already initialized
+                print("Already there, So Returning existing one")
+        return cls._instance
+        
+    @staticmethod
+    def calculate_area():
+        print("Area Calculated")
+
+def create_instance():
+    sq = Singleton()
+    print(f"instance id : {id(sq)}")
+
+if __name__ == "__main__":
+    threads  =[]
+    for _ in range(3):
+        t = Thread(target=create_instance)
+        threads.append(t)
+        t.start()
+    
+    for t in threads:
+        t.join()
+
+"""
+Initialized
+instance id : 2964932973136
+Already there, So Returning existing one
+instance id : 2964932973136
+Already there, So Returning existing one
+instance id : 2964932973136
+"""
+```
+Lock() ensures that only one thread can enter the __new__() method at a time. if one is already inside, others will wait until it finishes.
